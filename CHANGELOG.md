@@ -4,6 +4,15 @@ All notable changes to this project. Format: [Keep a Changelog](https://keepacha
 
 ## [Unreleased]
 
+### Design overhaul (2026-11-06) — see docs/DESIGN_AUDIT.md
+- Landing page rebuilt around one fictional message followed end-to-end with live engine output (13 checks, real
+  weights, 70/40/0 context comparison). Fixed “Twelve checks” and stale Test Lab copy; removed decorative floating
+  pills, emblem tilt/glow and the fake extension mock with its non-functional “Stop now”.
+- Design system: 10px buttons, 14px cards, cool silver-white light theme; navy brand bands in both themes.
+- Extension popup: new Home (Open CUSTODI Website via `src/config.ts`, scan this page, quick actions, latest result,
+  can/can't-see), new Website tab, expandable history, website fonts and tokens.
+- README rewritten with Mermaid diagrams and current screenshots.
+
 ### Docs (submission, 2026-11-06)
 - README: real CUSTODI screenshots (`docs/screenshots/custodi/`), link to the pitch deck in `presentation/`, and the
   exact Node.js requirement (20.19+, needed by Vite 7). Older TrustLayer screenshots are labelled as legacy.

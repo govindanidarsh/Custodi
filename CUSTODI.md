@@ -13,7 +13,7 @@ Hackathon problem: **PS 5 – The Fake HR Email.** A student pastes a suspicious
 ```
 packages/core     Shared detection engine: staged check pipeline (messages), structured checks (links, pages), 56 Test Lab cases, 99 unit tests
 apps/web          Website + installable PWA (React, Vite, Tailwind v4, Framer Motion, GSAP, React Three Fiber)
-apps/extension    Chrome extension (Manifest V3): This page, Message, Live Observe, History
+apps/extension    Chrome extension (Manifest V3): Home (scan this page, latest result, open website), Message, Website, Live Observe, History
 scripts/          Icon generator (no dependencies)
 frontend/         Older TrustLayer Next.js prototype (left untouched)
 ```
@@ -96,7 +96,7 @@ The full illustrated guide is in the app at **/extension**.
 | Verified | `/settings` → Trusted domains | Add `northwind.example`, then check `https://careers.northwind.example/jobs` | **Verified · your trusted list** |
 | Dashboard | `/dashboard` | After a few scans | Real counts, 14-day trend, categories, history search/filter, report drawer, JSON/CSV export, Clear history (with confirmation) |
 | Test Lab | `/lab` | **Run all tests**, then **Run** on any row, filters, **Reset** | 55/56 pass, 0 false positives, 1 false negative (L01, explained); confusion matrix; reason on every row |
-| Extension – This page | any website | CUSTODI icon → **This page** → **Scan this page** | Verdict + evidence; icon badge `!` (high) or `?` (medium) |
+| Extension – Scan this page | any website | CUSTODI icon → **Home** → **Scan this page** | Verdict + evidence; icon badge `!` (high) or `?` (medium) |
 | Live Observe | extension popup | **Live Observe** → 15/30/60 → **Start** → allow permission | Timer + **ON** badge, each page you open listed with evidence & action; **Stop now** → session summary |
 | Live Observe on the website | `/live` while a session runs (open at localhost) | Watch the page | Same timer, events and a working **Stop now** |
 | Share into PWA | installed Android PWA | Share a WhatsApp/SMS text to CUSTODI | Scanner opens pre-filled; the text is removed from the address bar |

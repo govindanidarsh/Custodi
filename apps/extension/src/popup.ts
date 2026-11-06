@@ -1,4 +1,5 @@
-import { analyzeMessage, checkRows, formatIncidentReport, type Channel, type Report } from "@custodi/core";
+import { analyzeMessage, analyzeUrl, checkRows, formatIncidentReport, type Channel, type Report } from "@custodi/core";
+import { websiteTarget, websiteUrl } from "./config";
 import {
   getLive,
   getTrustedDomains,
@@ -88,8 +89,25 @@ function selectTab(name: string) {
   document.querySelectorAll<HTMLButtonElement>("[data-tab]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.tab === name)));
   document.querySelectorAll<HTMLElement>("[data-panel]").forEach((p) => (p.hidden = p.dataset.panel !== name));
   if (name === "history") void renderHistory();
+  if (name === "home") void renderLatest();
+  const focus: Record<string, string> = { message: "#msg", website: "#url" };
+  if (focus[name]) $(focus[name]).focus();
 }
 document.querySelectorAll<HTMLButtonElement>("[data-tab]").forEach((btn) => btn.addEventListener("click", () => selectTab(btn.dataset.tab!)));
+document.querySelectorAll<HTMLButtonElement>("[data-goto]").forEach((btn) => btn.addEventListener("click", () => selectTab(btn.dataset.goto!)));
+
+// ---------- website & guides (central URL in ./config.ts) ----------
+async function openTab(url: string) {
+  await chrome.tabs.create({ url });
+  window.close();
+}
+{
+  const target = websiteTarget();
+  $("#site-host").textContent = target.isProduction ? new URL(target.base).host : "localhost:5173 · development";
+  $("#open-site").addEventListener("click", () => void openTab(websiteUrl("/")));
+  $("#open-web-guide").addEventListener("click", () => void openTab(websiteUrl("/extension")));
+  $("#open-guide").addEventListener("click", () => void openTab(chrome.runtime.getURL("welcome.html")));
+}
 
 // ---------- scan this page ----------
 $("#scan-page").addEventListener("click", async () => {
@@ -107,6 +125,7 @@ $("#scan-page").addEventListener("click", async () => {
     await setTabBadge(tab.id, report.riskLevel);
     await saveScan({ report, origin: "page" });
     renderReport(out, report);
+    void renderLatest();
   } finally {
     btn.disabled = false;
     btn.textContent = "Scan this page";
@@ -125,7 +144,61 @@ $("#scan-msg").addEventListener("click", async () => {
   const report = analyzeMessage({ text, channel }, { trustedDomains: await getTrustedDomains() });
   await saveScan({ report, origin: "message" });
   renderReport(out, report, text);
+  void renderLatest();
 });
+
+// ---------- website address ----------
+$("#use-tab").addEventListener("click", async () => {
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  const input = $<HTMLInputElement>("#url");
+  if (tab?.url && /^https?:/i.test(tab.url)) input.value = tab.url;
+  else $("#url-result").replaceChildren(el("p", "error", "This tab has no web address CUSTODI can read (browser and new-tab pages)."));
+  input.focus();
+});
+async function checkUrl() {
+  const input = $<HTMLInputElement>("#url").value.trim();
+  const out = $("#url-result");
+  if (!input) {
+    out.replaceChildren(el("p", "error", "Paste or type a web address first."));
+    return;
+  }
+  const report = analyzeUrl(input, { trustedDomains: await getTrustedDomains() });
+  await saveScan({ report, origin: "url" });
+  renderReport(out, report);
+}
+$("#check-url").addEventListener("click", () => void checkUrl());
+$("#url").addEventListener("keydown", (e) => {
+  if ((e as KeyboardEvent).key === "Enter") void checkUrl();
+});
+
+// ---------- latest result (Home) ----------
+const ORIGIN_TEXT: Record<StoredScan["origin"], string> = { page: "Page scan", message: "Message", live: "Live Observe", url: "Website check" };
+function scanLabel(r: Report) {
+  return r.kind === "message" ? "Message" : r.kind === "url" ? (r.hostname ?? r.input) : (r.hostname ?? r.url);
+}
+async function renderLatest() {
+  const { history = [] } = (await chrome.storage.local.get("history")) as { history?: StoredScan[] };
+  const box = $("#latest");
+  const h = history[0];
+  if (!h) {
+    box.replaceChildren(el("p", "muted empty", "No scans yet. Your most recent result will appear here."));
+    return;
+  }
+  const r = h.report;
+  const body = el("div", "ev-body");
+  const d = el("details", "latest", undefined, [
+    el("summary", "ev-head", undefined, [
+      el("span", `dot dot-${r.riskLevel}`),
+      el("span", "trunc", `${r.verdict.label} · ${ORIGIN_TEXT[h.origin]}: ${scanLabel(r)}`),
+      el("span", "muted", `${r.score}/100 · ${time(Date.parse(r.analyzedAt))}`),
+    ]),
+    body,
+  ]);
+  d.addEventListener("toggle", () => {
+    if (d.open && !body.childElementCount) renderReport(body, r);
+  });
+  box.replaceChildren(d);
+}
 
 // ---------- Live Observe ----------
 let minutes = 30;
@@ -191,14 +264,14 @@ async function renderLive() {
   $("#live-off").hidden = on;
   $("#live-on").hidden = !on;
   const chip = $("#status-chip");
-  chip.className = `chip ${on ? "chip-on" : "chip-off"}`;
+  chip.hidden = !on;
   if (timer) clearInterval(timer);
   renderSummary(lastSession ?? null, on ? live : null);
   if (on && live) {
     const tick = () => {
       const left = live.endsAt - Date.now();
       $("#live-timer").textContent = fmt(left);
-      chip.textContent = `Live Observe ON · ${fmt(left)}`;
+      chip.textContent = `Live ON · ${fmt(left)}`;
       if (left <= 0) void renderLive();
     };
     tick();
@@ -207,8 +280,6 @@ async function renderLive() {
     ul.replaceChildren();
     if (!live.events.length) ul.append(el("li", "muted", "Nothing checked yet. Switch to a tab or load a page."));
     live.events.forEach((e) => ul.append(eventItem(e)));
-  } else {
-    chip.textContent = "Live Observe off";
   }
 }
 
@@ -218,7 +289,7 @@ $("#live-start").addEventListener("click", async () => {
   // Must be requested from your click. Without it Live Observe can't read the pages you visit.
   const granted = await chrome.permissions.request({ origins: ["<all_urls>"] });
   if (!granted) {
-    err.textContent = "Live Observe needs that permission to check pages during the session. Nothing was started. You can still use “This page” without it.";
+    err.textContent = "Live Observe needs that permission to check pages during the session. Nothing was started. You can still use “Scan this page” without it.";
     err.hidden = false;
     return;
   }
@@ -243,14 +314,19 @@ async function renderHistory() {
   if (!history.length) ul.append(el("li", "muted", "No scans yet. Try “Scan this page”."));
   for (const h of history.slice(0, 40)) {
     const r = h.report;
-    const label = r.kind === "message" ? "Message" : r.kind === "url" ? (r.hostname ?? r.input) : (r.hostname ?? r.url);
-    ul.append(
-      el("li", "ev-head", undefined, [
+    const body = el("div", "ev-body");
+    const d = el("details", undefined, undefined, [
+      el("summary", "ev-head", undefined, [
         el("span", `dot dot-${r.riskLevel}`),
-        el("span", "trunc mono", label),
-        el("span", "muted", `${h.origin} · ${new Date(r.analyzedAt).toLocaleDateString()}`),
+        el("span", "trunc mono", scanLabel(r)),
+        el("span", "muted", `${ORIGIN_TEXT[h.origin]} · ${new Date(r.analyzedAt).toLocaleDateString()}`),
       ]),
-    );
+      body,
+    ]);
+    d.addEventListener("toggle", () => {
+      if (d.open && !body.childElementCount) renderReport(body, r);
+    });
+    ul.append(el("li", undefined, undefined, [d]));
   }
 }
 
@@ -269,6 +345,7 @@ $("#clear").addEventListener("click", async () => {
   await chrome.storage.local.remove(["history", "lastSession"]);
   await renderHistory();
   await renderLive();
+  await renderLatest();
 });
 
 // ---------- first-open intro (once; replayable from the footer) ----------
@@ -300,6 +377,7 @@ $("#replay-intro").addEventListener("click", playIntro);
 void (async () => {
   const { introSeen } = await chrome.storage.local.get("introSeen");
   if (!introSeen) playIntro();
+  await renderLatest();
   await renderLive();
   const live = await getLive();
   if (live?.active && live.endsAt > Date.now()) selectTab("live");

@@ -2,34 +2,34 @@
 
 /* ------------------------------------------------------------------
    CUSTODI design system — tokens
-   Light: warm ivory, charcoal, cobalt, restrained lime.
+   Light: cool silver-white, navy ink, cobalt.
    Dark:  deep midnight, soft white, electric blue, restrained lime.
    ------------------------------------------------------------------ */
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --bg: #f5f1e8;
-  --surface: #fdfbf6;
-  --surface-2: #ece6d9;
-  --line: #e0d8c7;
-  --line-strong: #cbbfa8;
-  --ink: #141316;
-  --ink-2: #2f2d31;
-  --muted: #67635c;
-  --accent: #24548f;
-  --accent-strong: #1a3f6d;
-  --accent-soft: #e1e9f4;
+  --bg: #f3f5f8;
+  --surface: #ffffff;
+  --surface-2: #e8ecf2;
+  --line: #d9dfe7;
+  --line-strong: #bcc6d3;
+  --ink: #0b1322;
+  --ink-2: #27324a;
+  --muted: #5a6577;
+  --accent: #1f56a8;
+  --accent-strong: #153f7e;
+  --accent-soft: #e2eaf6;
   --accent-ink: #ffffff;
   --lime: #4d5d70;
   --lime-bright: #6f8196;
   --lime-soft: #e6eaef;
-  --high: #c23b2e;
-  --high-soft: #f8e3df;
-  --medium: #9a6400;
-  --medium-soft: #f7ecd4;
-  --low: #1f7a4d;
-  --low-soft: #dff0e6;
-  --shadow: 0 1px 2px rgb(23 24 27 / 0.06), 0 8px 24px -12px rgb(23 24 27 / 0.12);
+  --high: #b8321f;
+  --high-soft: #f8e4e0;
+  --medium: #8f5d00;
+  --medium-soft: #f6ecd6;
+  --low: #1b7348;
+  --low-soft: #ddefe5;
+  --shadow: 0 1px 2px rgb(11 19 34 / 0.06), 0 8px 24px -12px rgb(11 19 34 / 0.14);
   --grain-opacity: 0.035;
   color-scheme: light;
 }
@@ -89,7 +89,7 @@
   --color-low-soft: var(--low-soft);
 
   --shadow-card: var(--shadow);
-  --radius-card: 1.25rem;
+  --radius-card: 0.875rem;
 }
 
 /* ------------------------------------------------------------------ base */
@@ -256,6 +256,10 @@ button {
 /* Silver needs a hairline edge to read on ivory; no recolouring of the artwork itself. */
 :root:not(.dark) .emblem-img {
   filter: drop-shadow(0 0 0.6px rgba(20, 32, 52, 0.75)) drop-shadow(0 1px 1px rgba(20, 32, 52, 0.18));
+}
+/* Dark-scoped brand bands keep the official artwork untouched in the light theme too. */
+:root:not(.dark) .dark .emblem-img {
+  filter: none;
 }
 .emblem-sheen {
   position: absolute;

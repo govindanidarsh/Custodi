@@ -94,10 +94,11 @@ export default function Extension() {
           <h2 className="t-h2">What it does</h2>
           <p className="mt-3 text-muted">Everything runs inside the extension on your computer, using the same analyzer as this website.</p>
         </div>
-        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {[
-            ["This page", "Click once to check the current tab: its address, visible text and whether it asks for OTPs, PINs or card details."],
+            ["Scan this page", "Click once to check the current tab: its address, visible text and whether it asks for OTPs, PINs or card details."],
             ["Message", "Paste a suspicious message right in the popup and get the same verdict, evidence and next steps."],
+            ["Website", "Check any web address — or this tab's — without opening it. Also: the latest result and a link to this website."],
             ["Live Observe", "Start a 15, 30 or 60-minute session. CUSTODI checks each page you view and shows a risk badge. Stop any time."],
           ].map(([t, d]) => (
             <li key={t} className="border-t-2 border-ink pt-4">
@@ -149,7 +150,7 @@ export default function Extension() {
           <h2 className="t-h2">Scan the current page</h2>
           <ol className="mt-4 list-decimal space-y-2 pl-5 text-ink-2">
             <li>Open the website you want to check.</li>
-            <li>Click the CUSTODI icon → <b>This page</b> → <b>Scan this page</b>.</li>
+            <li>Click the CUSTODI icon → <b>Home</b> → <b>Scan this page</b>.</li>
             <li>Read the verdict, the warning signs and what to do next. The icon shows <b className="text-high">!</b> (high) or <b className="text-medium">?</b> (medium) for that tab.</li>
           </ol>
         </div>

@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="color-scheme" content="light dark" />
+    <meta name="color-scheme" content="dark light" />
     <title>CUSTODI</title>
     <link rel="stylesheet" href="./src/popup.css" />
   </head>
@@ -15,24 +15,70 @@
       </div>
       <button id="intro-skip" class="intro-skip">Skip</button>
     </div>
+
     <header class="top">
       <img class="top-emblem" src="/assets/custodi-emblem.png" alt="" />
       <span class="brand">CUSTODI</span>
-      <span id="status-chip" class="chip chip-off" role="status">Live Observe off</span>
+      <span id="status-chip" class="chip chip-on" role="status" hidden></span>
     </header>
 
+    <button id="open-site" class="site-btn" type="button">
+      <span class="site-text">
+        <span class="site-title">Open CUSTODI Website</span>
+        <span id="site-host" class="site-host"></span>
+      </span>
+      <svg class="site-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3h8v8M13 3 3 13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    </button>
+
     <nav class="tabs" role="tablist" aria-label="CUSTODI sections">
-      <button role="tab" id="tab-page" data-tab="page" aria-selected="true">This page</button>
+      <button role="tab" id="tab-home" data-tab="home" aria-selected="true">Home</button>
       <button role="tab" id="tab-message" data-tab="message" aria-selected="false">Message</button>
-      <button role="tab" id="tab-live" data-tab="live" aria-selected="false">Live Observe</button>
+      <button role="tab" id="tab-website" data-tab="website" aria-selected="false">Website</button>
+      <button role="tab" id="tab-live" data-tab="live" aria-selected="false">Live</button>
       <button role="tab" id="tab-history" data-tab="history" aria-selected="false">History</button>
     </nav>
 
-    <section data-panel="page" role="tabpanel" aria-labelledby="tab-page">
-      <p class="lead">Check the tab you're looking at right now.</p>
-      <p class="muted">CUSTODI reads the address, the visible text and which kinds of sensitive fields (password, OTP, card) the page has. It never reads what you type.</p>
+    <section data-panel="home" role="tabpanel" aria-labelledby="tab-home">
+      <h1 class="lead-title">Check the page you're on.</h1>
+      <p class="muted">Reads this tab's address, visible text and which sensitive fields it asks for — only now, because you clicked. Never what you type.</p>
       <button id="scan-page" class="btn btn-primary">Scan this page</button>
       <div id="page-result" aria-live="polite"></div>
+
+      <ul class="actions" aria-label="Other checks">
+        <li>
+          <button data-goto="message"><span><b>Scan a message</b><small>Paste an email, SMS or WhatsApp text</small></span><i aria-hidden="true">›</i></button>
+        </li>
+        <li>
+          <button data-goto="website"><span><b>Check a website</b><small>Read an address without opening it</small></span><i aria-hidden="true">›</i></button>
+        </li>
+        <li>
+          <button data-goto="live"><span><b>Live Observe</b><small>A timed session you start and stop</small></span><i aria-hidden="true">›</i></button>
+        </li>
+      </ul>
+
+      <p class="label">Latest result</p>
+      <div id="latest"></div>
+
+      <details class="scope">
+        <summary>What CUSTODI can and can't see</summary>
+        <div class="split">
+          <ul class="ticks">
+            <li>The current tab — only when you click, or during Live Observe</li>
+            <li>Its address, visible text and form-field types</li>
+            <li>Messages you paste in yourself</li>
+          </ul>
+          <ul class="crosses">
+            <li>WhatsApp, SMS or email inboxes</li>
+            <li>What you type, or passwords</li>
+            <li>Anything in the background or after a session ends</li>
+          </ul>
+        </div>
+      </details>
+      <p class="help-row">
+        <button id="open-guide" class="linkbtn" type="button">Install &amp; help guide</button>
+        <span aria-hidden="true">·</span>
+        <button id="open-web-guide" class="linkbtn" type="button">Extension guide on the website</button>
+      </p>
     </section>
 
     <section data-panel="message" role="tabpanel" aria-labelledby="tab-message" hidden>
@@ -45,9 +91,21 @@
           <option value="sms">SMS</option>
           <option value="other">Other text</option>
         </select>
-        <button id="scan-msg" class="btn btn-primary grow">Analyse</button>
+        <button id="scan-msg" class="btn btn-primary grow">Analyse message</button>
       </div>
+      <p class="tiny">Checked here, on this computer. Links in the message are never opened.</p>
       <div id="msg-result" aria-live="polite"></div>
+    </section>
+
+    <section data-panel="website" role="tabpanel" aria-labelledby="tab-website" hidden>
+      <label for="url" class="label">Web address to check</label>
+      <input id="url" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://example-careers.site/apply" maxlength="2048" />
+      <div class="row">
+        <button id="use-tab" class="btn btn-ghost" type="button">Use this tab</button>
+        <button id="check-url" class="btn btn-primary grow" type="button">Check address</button>
+      </div>
+      <p class="tiny">CUSTODI reads the address as text — it never opens, visits or previews it. HTTPS alone doesn't make a site genuine.</p>
+      <div id="url-result" aria-live="polite"></div>
     </section>
 
     <section data-panel="live" role="tabpanel" aria-labelledby="tab-live" hidden>
@@ -100,6 +158,7 @@
     </section>
 
     <section data-panel="history" role="tabpanel" aria-labelledby="tab-history" hidden>
+      <p class="tiny first">Tap a scan to see its full result. Stored only in this browser.</p>
       <ul id="history" class="events"></ul>
       <div class="row">
         <button id="export" class="btn btn-ghost">Export JSON</button>

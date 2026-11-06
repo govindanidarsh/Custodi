@@ -102,7 +102,7 @@ export default function Help() {
 
           <Sec id="this-page" n={5} title="Use “This page”">
             <p>
-              On any website, click the CUSTODI icon → <b>This page</b> → <b>Scan this page</b>. CUSTODI checks the address, the visible text and whether the page
+              On any website, click the CUSTODI icon → <b>Home</b> → <b>Scan this page</b>. CUSTODI checks the address, the visible text and whether the page
               asks for OTPs, PINs, passwords or card numbers. It never reads what you've typed.
             </p>
           </Sec>

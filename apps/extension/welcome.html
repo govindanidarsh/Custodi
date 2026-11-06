@@ -27,7 +27,7 @@
 
     <ol class="steps">
       <li><div><h2>Pin it to the toolbar</h2><p>Click the puzzle-piece icon to the right of the address bar, find <b>CUSTODI</b> and click the pin. Risk badges (<b>!</b> high, <b>?</b> medium) and the <b>ON</b> badge appear on that icon.</p></div></li>
-      <li><div><h2>Scan the page you're on</h2><p>Open any website → click the CUSTODI icon → <b>This page</b> → <b>Scan this page</b>. CUSTODI checks the address, the visible text and whether the page asks for OTPs, PINs, passwords or card numbers.</p></div></li>
+      <li><div><h2>Scan the page you're on</h2><p>Open any website → click the CUSTODI icon → <b>Home</b> → <b>Scan this page</b>. CUSTODI checks the address, the visible text and whether the page asks for OTPs, PINs, passwords or card numbers.</p></div></li>
       <li><div><h2>Check a message</h2><p>Paste an email, SMS or WhatsApp text into the <b>Message</b> tab. You get the verdict, the exact suspicious words and every check CUSTODI ran.</p></div></li>
       <li><div><h2>Start and stop Live Observe</h2><p><b>Live Observe</b> tab → pick 15, 30 or 60 minutes → <b>Start</b> and allow the permission Chrome asks for. Each page you view is checked while the timer runs. Press <b>Stop now</b> any time to see the session summary — the permission is handed back automatically.</p></div></li>
     </ol>
@@ -51,7 +51,13 @@
       </div>
     </div>
 
+    <button id="open-site" class="site-btn" type="button" style="margin-top: 24px">
+      <span class="site-text"><span class="site-title">Open CUSTODI Website</span><span id="site-host" class="site-host"></span></span>
+      <svg class="site-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3h8v8M13 3 3 13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    </button>
+
     <p class="tiny" style="margin-top: 24px">Updated the code? Run <code>npm run build:extension</code>, then click ↻ on CUSTODI in <code>chrome://extensions</code>. The extension is loaded from <code>apps/extension/dist</code> (the folder with <code>manifest.json</code>).</p>
     <footer class="foot">Automated warning signs, not proof. Verify offers with your placement cell.</footer>
+    <script type="module" src="./src/welcome.ts"></script>
   </body>
 </html>

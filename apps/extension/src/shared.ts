@@ -6,7 +6,7 @@ import { analyzePage, analyzeUrl, EMPTY_FIELDS, type PageReport, type PageSignal
 
 export interface StoredScan {
   report: Report;
-  origin: "page" | "message" | "live";
+  origin: "page" | "message" | "live" | "url";
 }
 
 /** One page checked during a Live Observe session. Only the result is kept — never the page text. */
