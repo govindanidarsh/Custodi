@@ -1,79 +1,65 @@
-# TrustLayer AI
+# CUSTODI — Your Personal Digital Bodyguard
 
-**Don't trust blindly. Verify intelligently.**
+**Think before you trust. Verify before you act.**
 
-TrustLayer AI helps students check suspicious placement, internship and recruiter messages. Paste an email,
-SMS or WhatsApp message and see a risk level, the exact phrases that look risky, why they matter, and the
-safe next step — without false alarms on genuine offers.
+CUSTODI helps students check suspicious placement, internship and recruiter messages — and the links in them —
+before they act. Paste an email, SMS or WhatsApp message (or check a web address, or the page you're on in Chrome)
+and get a risk level, the exact words that raised concern, a transparent score breakdown and a safe next step.
 
-Built for the Arthakram Rapid Prototyping Hackathon (PS 5 — "The Fake HR Email").
+Built for the Arthakram Rapid Prototyping Hackathon (PS 5 — "The Fake HR Email"). **Hackathon prototype.**
 
-> **Status:** Phase 1 — frontend complete with **mock (demonstration) results**. The backend and AI analysis
-> are not built yet. Every result in the UI is labelled "Demonstration data".
+Everything runs on the user's device: no server, no AI service, no uploads.
 
-![Landing page](docs/screenshots/desktop-landing.png)
+## What's in this repository
 
-## Repository structure
 ```
-TrustLayer-AI/
-├── CLAUDE.md · README.md · PRODUCT_SPEC.md · ARCHITECTURE.md · API_CONTRACT.md
-├── SECURITY_AND_PRIVACY.md · RISK_RULES.md · TEST_PLAN.md · TEAM_WORKFLOW.md · CHANGELOG.md
-├── frontend/      Next.js App Router + TypeScript + Tailwind (owner: Antriksh)
-├── backend/       FastAPI service — placeholder, Phase 3 (owner: Darsh)
-├── research/      Fictional sample messages + detection research (owner: Kushagri)
-├── docs/          Screenshots, architecture notes, demo material
-└── .github/       Issue templates + pull request template
+packages/core     Shared detection engine — 13-check message pipeline, website & page analysis,
+                  weighted scoring, 83 fictional Test Lab cases, 120 unit tests (Vitest)
+apps/web          Website + installable PWA (React, Vite, Tailwind CSS v4, Framer Motion, GSAP)
+apps/extension    Chrome extension (Manifest V3): scan this page, message scan, Live Observe sessions
+scripts/          Logo/icon generator (Node) and intro-video renderer (Swift + ffmpeg, macOS)
+frontend/, backend/, research/, docs/   Earlier "TrustLayer AI" prototype and planning material (legacy, not used by CUSTODI)
 ```
 
-## Prerequisites
-- Node.js **20.9+** (LTS recommended) and npm 10+
-- Git
-- Python 3.11+ (only needed from Phase 3, for the backend)
+The website, the PWA and the extension all import the same analyzer from `packages/core`.
 
-## Run the frontend locally
+## Run it
+
+Requires Node.js 20+.
+
 ```bash
-git clone https://github.com/Antrikshcodes/Trustsheild-AI.git
-cd Trustsheild-AI/frontend
 npm install
-cp .env.example .env.local     # optional — defaults to demo mode
-npm run dev
+npm run dev            # website at http://localhost:5173
+npm test               # analyzer unit tests
+npm run check          # typecheck + tests + build website and extension
 ```
-Open http://localhost:3000.
 
-### Useful scripts (run inside `frontend/`)
-| Command | What it does |
-|---|---|
-| `npm run dev` | Start the dev server |
-| `npm run build` / `npm start` | Production build / serve it |
-| `npm run lint` | ESLint |
-| `npm run typecheck` | TypeScript, no emit |
-| `npm run check` | Lint + typecheck + build — run before every PR |
-| `npm run format` | Prettier |
+### Chrome extension
+```bash
+npm run build:extension
+```
+Then open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked** and choose `apps/extension/dist`.
+Full guide: the website's `/extension` page, or [CUSTODI.md](CUSTODI.md).
 
-### Environment variables (`frontend/.env.local`)
-| Variable | Default | Purpose |
-|---|---|---|
-| `NEXT_PUBLIC_ANALYZER_MODE` | `demo` | `demo` = in-browser mock; `api` = call the backend (Phase 3+) |
-| `NEXT_PUBLIC_API_BASE_URL` | `http://localhost:8000` | Backend URL when mode is `api` |
+## How detection works
 
-Never put API keys in frontend env files — anything prefixed `NEXT_PUBLIC_` is visible to users.
+Transparent, deterministic rules — no black box. Each kind of warning adds fixed points, counted once:
+OTP/PIN/password request +35, payment or fee +30, app install or remote access +30, impersonation +20, threats +15,
+secrecy +15, disguised link +15, urgency +10, unrealistic reward +10, unexpected contact +5 (plus documented
+context modifiers). **0–19 Low · 20–49 Medium · 50–100 High.** Direct OTP/PIN/password requests and remote-access
+installs are always High. Risk, confidence and sender verification are reported separately. Details: [CUSTODI.md](CUSTODI.md).
 
-## Using the app
-1. Click **Check a message** or scroll to the analyzer.
-2. Pick where you received it (Email / SMS / WhatsApp / Other), paste the text, optionally add the sender.
-3. Click **Analyze Message**, or try one of the four fictional examples.
-4. Read the risk level, highlighted phrases, warning cards and safe next steps.
+The Test Lab (`/lab`) runs every fictional case live and shows true/false positives and negatives. These are the
+team's own cases — **not** a real-world accuracy figure.
 
-Tip for demos: add `?demoError=1` to the URL to preview the error state.
+## Privacy and limits
 
-## Contributing
-Read [TEAM_WORKFLOW.md](TEAM_WORKFLOW.md) and [CLAUDE.md](CLAUDE.md). In short: never commit to `main`, work on
-a `feat/...` or `fix/...` branch, run `npm run check`, open a PR with the template, get one review.
+- Messages and links are analysed on the device; links are never opened.
+- Only results (not full messages, by default) are stored in the browser, with export and delete controls.
+- The extension only reads a page when you click, or during a timed Live Observe session you start and can stop.
+  It cannot read WhatsApp, SMS or email inboxes.
+- CUSTODI gives automated warning signs, not proof. A Low result does not guarantee a message is safe.
+  Verify important offers through your placement cell. Never share passwords, OTPs or payment credentials.
 
 ## Team
 Antriksh (frontend + product) · Darsh (backend) · Kushagri (R&D + QA) · Teammate 4 (AI integration + DevOps)
-
-## Limitations
-TrustLayer provides automated warning signals for educational and safety assistance. It cannot guarantee
-that a message is genuine or fraudulent. Verify important opportunities independently through official
-channels. Never share passwords, OTPs or payment credentials.
