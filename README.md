@@ -4,7 +4,7 @@
 
 # CUSTODI
 
-**Think before you trust. Verify before you act.**
+**Think before you trust, Verify before you act.**
 
 An on-device safety check for placement, internship and recruiter messages — and the links inside them.
 
