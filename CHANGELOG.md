@@ -4,6 +4,10 @@ All notable changes to this project. Format: [Keep a Changelog](https://keepacha
 
 ## [Unreleased]
 
+### Docs (submission, 2026-11-06)
+- README: real CUSTODI screenshots (`docs/screenshots/custodi/`), link to the pitch deck in `presentation/`, and the
+  exact Node.js requirement (20.19+, needed by Vite 7). Older TrustLayer screenshots are labelled as legacy.
+
 ### Deployment (Vercel, 2026-11-06)
 - Added root `vercel.json`: Vercel builds from the repository root (so npm workspaces install `@custodi/core`),
   runs `npm ci` + `npm run build:web` and serves `apps/web/dist` — the previous deploy failed looking for `public`.

@@ -12,9 +12,26 @@ Built for the Arthakram Rapid Prototyping Hackathon (PS 5 — "The Fake HR Email
 
 Everything runs on the user's device: no server, no AI service, no uploads.
 
+## Screenshots
+
+Real captures of the current build (every message and address shown is fictional).
+
+| Message scan — evidence and score breakdown | Website check — address read, never opened |
+|---|---|
+| ![Message scan result: Suspicious, 70/100, with quoted evidence and score breakdown](docs/screenshots/custodi/message-scan-result.png) | ![Website check result for a fictional address: Suspicious, 45/100](docs/screenshots/custodi/website-check.png) |
+
+| Test Lab — 83 fictional cases run live | Dashboard — on-device scan history |
+|---|---|
+| ![Test Lab after Run all tests: 83/83, confusion matrix](docs/screenshots/custodi/test-lab.png) | ![Dashboard with scan totals, risk trend and recent activity](docs/screenshots/custodi/dashboard.png) |
+
+More: [home page](docs/screenshots/custodi/home.png) · [phone](docs/screenshots/custodi/mobile-home.png) ·
+[Chrome extension guide](docs/screenshots/custodi/extension-guide.png) ·
+pitch deck, script and judge Q&A in [`presentation/`](presentation/).
+
 ## What's in this repository
 
 ```
+presentation/     Pitch deck (PPTX + PDF), presenter script and judge Q&A
 packages/core     Shared detection engine — 13-check message pipeline, website & page analysis,
                   weighted scoring, 83 fictional Test Lab cases, 120 unit tests (Vitest)
 apps/web          Website + installable PWA (React, Vite, Tailwind CSS v4, Framer Motion, GSAP)
@@ -27,7 +44,7 @@ The website, the PWA and the extension all import the same analyzer from `packag
 
 ## Run it
 
-Requires Node.js 20+.
+Requires Node.js 20.19+ (or 22+) and npm. No API keys, accounts or `.env` file are needed.
 
 ```bash
 npm install
