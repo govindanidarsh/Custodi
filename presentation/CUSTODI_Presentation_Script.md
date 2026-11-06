@@ -1,124 +1,131 @@
 # CUSTODI — Presentation Script (10 slides)
 
-**Deck:** `CUSTODI_Hackathon_Presentation.pptx` (10 slides, 16:9). The same words are in each slide's speaker notes.
+**Deck:** `CUSTODI_Hackathon_Presentation.pptx` (10 slides, 16:9). The same words are in each slide's speaker notes. Slide previews are in `presentation/slide-previews/`.
 **Length:** about 30–45 seconds per slide, roughly 6–7 minutes in total.
-**Tone:** speak to the judges like you're explaining it to a friend. Slow down on slides 4 and 5.
+**Delivery:** the slides are deliberately light on text. The visuals carry the story and your voice carries the detail, so slow down on slides 4 and 5.
 
-> Every message, name, number and web address in the deck is fictional. Every score and test count comes from a real run of the CUSTODI engine and its Test Lab.
+> Every message, name, number and web address is fictional. The device screens are real CUSTODI screenshots. Every score and test count comes from a real run of the CUSTODI engine and its Test Lab.
 
 ---
 
-### Slide 1 — CUSTODI (≈25 s)
+### 1 · Launch (≈20 s)
+*Visual: the official emblem, lit, with its reflection.*
 
 > "Think before you trust. Verify before you act.
 > We're team CUSTODI — Antriksh, Darsh and Kushagri — and we chose PS 5, *The Fake HR Email*.
-> CUSTODI is an on-device check that tells a student whether a placement, internship or recruiter message is safe to act on — and shows exactly why."
+> CUSTODI is an on-device check for placement, internship and recruiter messages."
 
-**Transition:** "Let's start with what the problem statement actually asks for."
-
----
-
-### Slide 2 — Understanding the problem statement (≈45 s)
-
-> "This is PS 5, quoted as it appears in our brief. A student pastes a suspicious message and must instantly get a risk level, the reasons, a clear next step, and a reminder to verify through the official placement cell. The brief names three dangers: OTP theft, ignored training and alert fatigue.
-> On the right is a fictional fake HR email. It looks professional, but it comes from a personal Gmail, asks the student to share an OTP, and adds a 15-minute deadline with a threat. CUSTODI scores it 65 out of 100, High. The OTP request alone forces High.
-> Why isn't 'be careful' enough? Training is forgotten under deadline pressure, constant warnings get ignored, and between receiving a message and verifying it, the student has only the message itself."
-
-**Transition:** "That gap is exactly where CUSTODI sits."
+**→** "Let's look at what a fake HR message really looks like."
 
 ---
 
-### Slide 3 — Our solution (≈40 s)
+### 2 · The problem (≈45 s)
+*Visual: a phone with a fictional fake offer, four callouts, CUSTODI's verdict.*
 
-> "CUSTODI is a defensive verification tool with three ways in.
-> The **message scanner**: paste email, SMS or WhatsApp text and get a risk score, the exact words behind it, and what to do next.
-> The **website checker** reads an address without ever opening it, flags structural tricks, and says 'unavailable' when reputation is unknown.
-> The **Chrome extension** scans the page you're on, but only when you click.
-> The journey is always the same: message received, CUSTODI analysis, an assessment you can understand, and one recommended action.
-> One honest line: CUSTODI helps students decide. It never guarantees a message is safe."
+> "PS 5 asks for exactly this: a student pastes a suspicious message and instantly gets a risk level, the reasons, a clear next step, and a reminder to verify through the placement cell. It names three dangers: OTP theft, ignored training and alert fatigue.
+> Here's a fictional message on a student's phone. It doesn't look like a scam. It looks like a first job offer.
+> But look closer. It promises selection with no interview. It asks for a registration fee. It wants bank details by message. And it sets a two-hour deadline.
+> Under that pressure, training is forgotten, and the student has only the message. CUSTODI scores this exact message 100 out of 100, High."
 
-**Transition:** "So how does it actually work under the hood?"
-
----
-
-### Slide 4 — How CUSTODI works (≈45 s)
-
-> "Every check runs through the same seven-stage pipeline: input, parsing, thirteen indicator checks written for English and common Hinglish, then context and negation handling, scoring, classification, and an explainable report.
-> The website and the Chrome extension both import one TypeScript package, custodi-core, so they can never disagree. Results are saved in local browser storage.
-> There's no server and no AI API. That means it costs nothing per scan, nothing leaves the device, and the same input always gives the same result, so we can test it properly."
-
-**Transition:** "The interesting part is how it decides."
+**→** "So we built the thing students can check with."
 
 ---
 
-### Slide 5 — The intelligence (≈50 s, the key slide)
+### 3 · Meet CUSTODI (≈35 s)
+*Visual: the real website on a MacBook, a real scan result on an iPhone.*
 
-> "Each kind of warning has a fixed weight and counts once. An OTP request is 35, a fee is 30, a bank-detail request is 20. Repeating a phrase can't inflate the score. Under 20 is Low, 20 to 49 is Caution, and 50 and above is High.
-> But keywords aren't enough. Context matters. All three of these messages ask for the same bank details.
-> On WhatsApp before any offer: **70, High.**
+> "This is CUSTODI, the real product on a laptop and a phone.
+> There are three ways in. The message scanner checks anything you paste. The website checker reads an address without opening it. And the Chrome extension checks the page you're on, when you click.
+> Whichever way in, you get a risk level, the exact words behind it, and one recommended action. It helps students decide; it never guarantees a message is safe."
+
+**→** "Here's how it's built."
+
+---
+
+### 4 · Technical architecture (≈45 s)
+*Visual: a silver-white engineering diagram with a single spine.*
+
+> "Both surfaces — the React and Vite website, which also installs as an app, and the Manifest V3 Chrome extension — import one shared TypeScript package, custodi-core.
+> Input flows through the shared analyzer, then detection and context: thirteen checks in English and common Hinglish, with negation and official-channel handling. Then comes a deterministic score, then an explainable output. Results are saved in local storage.
+> Because it's deterministic and local, it's testable, it costs nothing per scan, it sends nothing anywhere, and the website, app and extension can never disagree."
+
+**→** "The clever part is how it reads context."
+
+---
+
+### 5 · The intelligence (≈50 s, the key slide)
+*Visual: three phones showing real results of 70, 40 and 0.*
+
+> "All three of these messages ask for the same bank details, and these are real CUSTODI results.
+> On WhatsApp, before any offer: **70, High**.
 > By email after accepting, but from a Gmail address: **40, Caution**. Verify it.
-> Directed to the official onboarding portal after accepting: **zero, Low**. That's normal payroll onboarding.
-> Negation matters too: 'never share your OTP' is advice, not a request; a stipend isn't a fee; scam text quoted inside a placement-cell warning becomes a note.
-> And one honest limit: CUSTODI reads the wording. It can't confirm that a portal really is official."
+> Through the official onboarding portal after accepting: **zero, Low**. That's normal payroll onboarding.
+> Context changes the verdict, not keywords. The engine also handles negation: 'never share your OTP' is advice, not a request, and a stipend isn't a fee.
+> One honest limit: CUSTODI reads the wording. It can't confirm a portal is genuinely official."
 
-**Transition:** "Is this realistic to run? Yes. Here's the evidence."
-
----
-
-### Slide 6 — Feasibility (≈40 s)
-
-> "Technically, it's built on mature open tools — React, Vite, TypeScript and Chrome's Manifest V3 — around one shared engine.
-> Operationally, it needs no cloud and no paid API, and results are in plain language, so no security training is needed.
-> On privacy, it only scans when the student acts, never reads inboxes, and keeps results on the device.
-> And it's tested: all 120 unit tests pass, all 83 Test Lab cases behave as designed, the production build was checked across 110 page loads with no errors, and we loaded and drove the extension in real Chrome.
-> The caveat: those 83 cases are ours and fictional. They're not a real-world accuracy figure."
-
-**Transition:** "Building it is one thing. Sustaining it is another."
+**→** "Can this actually run in the real world?"
 
 ---
 
-### Slide 7 — Viability (≈40 s)
+### 6 · Feasibility (≈40 s)
+*Visual: MacBook showing the Test Lab, the real extension popup, the app on a phone.*
 
-> "This is an illustrative business model, and we say so on the slide. Nothing here is validated yet.
-> Students get the core checks free and private. The payer is the institution: colleges and universities, through a subscription, in return for placement-cell tools, awareness campaigns and, only with consent, anonymised trends. Recruitment firms are a second segment, through enterprise licences and integrations.
-> The argument is simple: preventing even one student from losing money or identity documents can justify a college's subscription.
-> The starred items aren't built, and we have no customers or prices yet. That's exactly what a pilot is for."
+> "It runs on what students already have: a laptop browser, a phone, and Chrome.
+> It's built on mature open tools: React, Vite, TypeScript and a Manifest V3 extension, around one shared engine. There's no server, no cloud and no paid API, just static hosting. It scans only when asked and never reads inboxes.
+> The laptop is showing our Test Lab: 83 of 83 cases behave as designed. On top of that, 120 unit tests pass, 110 production page loads ran with no errors, and we drove the extension in real Chrome.
+> Those cases are our own fictional ones, so this isn't a real-world accuracy claim."
 
-**Transition:** "And if it works, here's how it grows."
-
----
-
-### Slide 8 — Scalability and roadmap (≈35 s)
-
-> "We grow in four directions: product, technology, adoption and geography. Only the highlighted column exists today: the 13-check engine, website checker, extension and installable app, running fully locally.
-> Next comes more rules and message formats, an optional opt-in backend for institutions, a placement-cell pilot and a Chrome Web Store release.
-> Long term: more Indian languages, university and recruiter partnerships, then other regions. We start where the problem is sharpest, with Indian students facing recruitment scams."
-
-**Transition:** "But other tools already exist. Why CUSTODI?"
+**→** "Building it is one thing. Sustaining it is another."
 
 ---
 
-### Slide 9 — Why CUSTODI? (≈40 s)
+### 7 · Business viability (≈40 s)
+*Visual: a silver-white ecosystem with CUSTODI at the centre and the proposed revenue model.*
 
-> "We tried to be fair here. Spam filters, antivirus and URL reputation checkers are good at something CUSTODI deliberately doesn't do: knowing which senders and links are already known to be bad. A placement cell can verify anything, but not instantly, and not at midnight.
-> CUSTODI's combination is different: it's built for recruitment scams, reads context rather than just keywords, explains every point, checks messages and websites in one place, and runs locally.
-> Other tools ask 'is this sender or link known to be bad?' CUSTODI asks 'what is this message asking me to do, and does that make sense here?'"
+> "This is a proposed model, not existing revenue, and the slide says so.
+> Students and job seekers get free core checks. Colleges and universities are the payers, through institutional subscriptions, in return for placement-cell tools, awareness campaigns and, only with consent, anonymised trends. Recruitment organisations are a second segment, through enterprise licensing and custom integrations.
+> The argument: preventing even one student from losing money or identity documents can justify a college's subscription.
+> The starred features aren't built, and we have no customers or pricing yet. A pilot is how we'd validate it."
 
-**Transition:** "So what happens next?"
+**→** "And if it works, it grows outward."
 
 ---
 
-### Slide 10 — Impact and close (≈40 s)
+### 8 · Scalability (≈35 s)
+*Visual: rings expanding from one student to wider markets.*
 
-> "Today it's a working prototype, open on GitHub. Next, we deploy the website, point the extension at it and submit it to the Chrome Web Store. Then a pilot with one placement cell: we introduce it at placement orientation and pin it in the official groups. We'll measure false alarms on genuine messages, scams reported, and how long verification takes. Then we scale through recruiter lists verified by placement cells.
-> Our goal is fewer students acting on fake offers before they verify, and we'll measure that, not assume it.
-> CUSTODI. Think before you trust. Verify before you act. Because the cost of trusting the wrong message can be much greater than the time it takes to verify it. Thank you."
+> "CUSTODI grows outward like ripples. The solid inner ring is the only one that exists today: the 13-check engine, website checker, extension and installable app, running fully locally.
+> Next are colleges: a placement-cell pilot and a Chrome Web Store release, with more rules and an optional, opt-in backend for institutions.
+> Later come universities, the recruitment ecosystem, and new languages and regions. A shared engine means every new rule reaches every surface at once.
+> We have no partnerships or customers yet. This is the path, not a claim."
+
+**→** "Why build this when other tools exist?"
+
+---
+
+### 9 · Why CUSTODI (≈40 s)
+*Visual: a silver-white comparison with CUSTODI in a dark column.*
+
+> "We kept this fair. Spam filters, URL reputation checkers and browser security are good at something CUSTODI deliberately doesn't do: knowing which senders and links are already known to be bad. Manual verification through the placement cell can check anything, but not instantly, and not at midnight.
+> CUSTODI's difference is the combination: it's built for recruitment scams, reads context rather than just keywords, explains every point, checks messages and websites in one place, and runs locally.
+> Others ask if something is known to be bad. CUSTODI asks if it makes sense."
+
+**→** "Here's where we go from here."
+
+---
+
+### 10 · Close (≈25 s)
+*Visual: the emblem and the closing line.*
+
+> "Our next step is a pilot with one placement cell: introduce CUSTODI at placement orientation, then measure false alarms on genuine messages, scams reported and time to verify, and grow from there.
+> Because the cost of trusting the wrong message is far greater than the time it takes to verify it.
+> CUSTODI. Think before you trust. Verify before you act. Thank you."
 
 ---
 
 ## If you're asked for a live demo
 
 1. `npm install && npm run dev` → http://localhost:5173
-2. **Scan:** paste the slide-2 email, choose Email, and enter the sender `hr.northwind.careers@gmail.com`. Expect **65/100 · High (Suspicious)**.
-3. **Context:** open the Test Lab (`/lab`) and press **Run all tests**. Expect **83/83**. Find R10 (40) and M42 (0).
+2. **Slide 2's message:** paste it into **Scan** (WhatsApp). Expect **100/100 · High**.
+3. **Slide 5:** open **Test Lab** (`/lab`) and press **Run all tests**. Expect **83/83**. Find R10 (40) and M42 (0).
 4. **Website:** `https://campus-offer-verify-portal.xyz/login` → **45/100 · Suspicious**.
