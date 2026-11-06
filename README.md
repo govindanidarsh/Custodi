@@ -43,6 +43,11 @@ npm run build:extension
 Then open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked** and choose `apps/extension/dist`.
 Full guide: the website's `/extension` page, or [CUSTODI.md](CUSTODI.md).
 
+### Deploy the website (Vercel)
+`vercel.json` at the repository root holds the settings. In the Vercel project, leave **Root Directory** empty
+(repository root) and **Framework Preset** as *Other*; the file supplies `npm ci`, `npm run build:web` and the
+output directory `apps/web/dist`. The Chrome extension is not deployed — it is loaded from `apps/extension/dist`.
+
 ## How detection works
 
 Transparent, deterministic rules — no black box. Each kind of warning adds fixed points, counted once:

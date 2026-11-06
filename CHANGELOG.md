@@ -4,6 +4,12 @@ All notable changes to this project. Format: [Keep a Changelog](https://keepacha
 
 ## [Unreleased]
 
+### Deployment (Vercel, 2026-11-06)
+- Added root `vercel.json`: Vercel builds from the repository root (so npm workspaces install `@custodi/core`),
+  runs `npm ci` + `npm run build:web` and serves `apps/web/dist` — the previous deploy failed looking for `public`.
+  SPA rewrite sends extension-less paths to `index.html` (real files, the service worker and intro videos are served
+  as-is); `sw.js`, `manifest.webmanifest` and `index.html` are revalidated on every load so PWA updates arrive.
+
 ### Fixed (real Chrome negative-control test, 2026-11-06)
 - “Wants you to continue by phone” fired on WhatsApp bank-detail requests because “bank account number” was read as a
   phone number. The phone-lure rule now ignores account/card/ID numbers; a new, accurate indicator — “Requests sensitive
