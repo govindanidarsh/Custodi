@@ -1,16 +1,16 @@
 /**
  * Where the popup's "Open CUSTODI Website" action (and its help links) point.
  *
- * ▶ When the website is deployed, set PRODUCTION_WEB_URL below to its https address
- *   (for example "https://custodi.vercel.app") — or build with
- *   VITE_CUSTODI_WEB_URL=https://… npm run build:extension
- *   — then rebuild the extension and reload it in chrome://extensions.
+ * ▶ The production address is set once, in DEFAULT_PRODUCTION_URL in ../vite.config.ts
+ *   (currently https://custodi-phi.vercel.app). A build can override it with
+ *   VITE_CUSTODI_WEB_URL=https://… npm run build:extension. The same origin is written into the
+ *   manifest's externally_connectable at build time.
  *
- * Until a production URL is set, the popup opens the local development server instead and says so.
+ * If no valid https address is configured, the popup opens the local development server instead and says so.
  */
 const FROM_ENV = (import.meta.env.VITE_CUSTODI_WEB_URL as string | undefined)?.trim() ?? "";
 
-export const PRODUCTION_WEB_URL: string = FROM_ENV || ""; // ← paste the deployed https URL between the quotes
+export const PRODUCTION_WEB_URL: string = FROM_ENV;
 
 /** `npm run dev` serves the website here (apps/web, Vite). Development only. */
 export const DEV_WEB_URL = "http://localhost:5173";
@@ -34,6 +34,20 @@ export interface WebsiteTarget {
 export function websiteTarget(): WebsiteTarget {
   const prod = validProduction(PRODUCTION_WEB_URL);
   return prod ? { base: prod, isProduction: true } : { base: DEV_WEB_URL, isProduction: false };
+}
+
+/** localhost / 127.0.0.1 on any port — development only. */
+const DEV_ORIGIN = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
+
+/**
+ * Origins allowed to talk to the extension (Live Observe status, stop, trusted-domain sync): the configured
+ * production website plus localhost for development. Must match `externally_connectable` in the built
+ * manifest, which the build writes from the same setting (see vite.config.ts).
+ */
+export function isAllowedWebOrigin(origin: string | undefined): boolean {
+  if (!origin) return false;
+  const prod = validProduction(PRODUCTION_WEB_URL);
+  return origin === prod || DEV_ORIGIN.test(origin);
 }
 
 /** Absolute URL of a page on the CUSTODI website, e.g. websiteUrl("/extension"). */

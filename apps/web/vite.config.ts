@@ -40,6 +40,8 @@ export default defineConfig({
       },
       workbox: {
         navigateFallback: "/index.html",
+        // Downloads (the extension ZIP) must reach the network, never the app shell.
+        navigateFallbackDenylist: [/^\/downloads\//],
         globPatterns: ["**/*.{js,css,html,svg,png,woff2}"],
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         // Only Vite's content-hashed bundles skip revisioning; brand images in /assets get a revision so they update.

@@ -4,6 +4,16 @@ All notable changes to this project. Format: [Keep a Changelog](https://keepacha
 
 ## [Unreleased]
 
+### Deployment: website + downloadable extension (2026-11-06)
+- `npm run build:deploy` (used by `vercel.json`): builds the website, builds the extension for the deployed origin
+  (`VERCEL_PROJECT_PRODUCTION_URL` / `CUSTODI_WEB_URL`) and publishes `/downloads/custodi-extension.zip` with its
+  version, size and SHA-256. Dependency-free ZIP writer; build fails if a required extension file is missing.
+- Extension 0.3.0 targets https://custodi-phi.vercel.app (`DEFAULT_PRODUCTION_URL` in `apps/extension/vite.config.ts`). Allowed website origins come from one setting — the production origin is added to
+  `externally_connectable` at build time and checked in the service worker; localhost stays for development. No new permissions.
+- `/extension` is now the public “Get CUSTODI” page: routes to the scanner and website check, the download with
+  install steps for “Load unpacked”, permissions, limitations and troubleshooting.
+- Service worker no longer intercepts `/downloads/`; copy no longer tells users to open the site at localhost.
+
 ### Design overhaul (2026-11-06) — see docs/DESIGN_AUDIT.md
 - Landing page rebuilt around one fictional message followed end-to-end with live engine output (13 checks, real
   weights, 70/40/0 context comparison). Fixed “Twelve checks” and stale Test Lab copy; removed decorative floating

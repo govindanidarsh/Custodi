@@ -119,8 +119,8 @@ function Status() {
       <div className="panel p-6">
         <p className="t-h3">Extension not detected</p>
         <p className="mt-2 text-sm text-muted">
-          Install the CUSTODI extension to use Live Observe. If it's installed, make sure you opened this page at <span className="font-mono">localhost</span> —
-          the extension only talks to CUSTODI running on your own computer — then reload.
+          Install the CUSTODI extension to use Live Observe. If it's installed, make sure it's the version downloaded from this website and that it's switched on —
+          the extension only talks to this website's own address — then reload.
         </p>
         <div className="mt-5 flex flex-wrap gap-2">
           <ButtonLink to="/extension">Install the extension</ButtonLink>

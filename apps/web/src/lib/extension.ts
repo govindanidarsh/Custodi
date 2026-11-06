@@ -1,6 +1,7 @@
 /**
  * Talks to the CUSTODI Chrome extension (if installed) through Chrome's externally_connectable channel.
- * The extension only accepts these messages from http://localhost / 127.0.0.1 and only allows:
+ * The extension only accepts these messages from the deployed CUSTODI website (and http://localhost for development —
+ * see apps/extension/src/config.ts) and only allows:
  * reading Live Observe status, stopping a session and syncing trusted domains. It cannot be started from
  * the website — starting needs your click inside the extension so Chrome can ask for permission.
  */

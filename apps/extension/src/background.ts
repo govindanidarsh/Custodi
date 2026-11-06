@@ -17,6 +17,7 @@ import {
   type LiveState,
   type SessionSummary,
 } from "./shared";
+import { isAllowedWebOrigin } from "./config";
 
 const recent = new Map<number, { url: string; at: number }>();
 const DURATIONS = [15, 30, 60];
@@ -123,12 +124,11 @@ chrome.runtime.onMessage.addListener((msg: { type?: string; minutes?: number }, 
   return false;
 });
 
-// ---------- messages from the CUSTODI website (localhost only, see externally_connectable) ----------
+// ---------- messages from the CUSTODI website (its production origin or localhost — see config.ts) ----------
 // The website can see status, stop a session and sync trusted domains. It can NOT start a session:
 // starting needs your click inside the extension, because only then can Chrome ask for permission.
 chrome.runtime.onMessageExternal.addListener((msg: { type?: string; domains?: unknown }, sender, sendResponse) => {
-  const origin = sender.origin ?? "";
-  if (!/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) return false;
+  if (!isAllowedWebOrigin(sender.origin)) return false;
   if (msg?.type === "custodi:status") {
     status().then((s) => sendResponse({ ok: true, ...s }));
     return true;

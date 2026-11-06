@@ -138,7 +138,11 @@ npm run check        # typecheck + tests + build website and extension
 npm run build:web    # production website → apps/web/dist
 ```
 
-Deploying the website: `vercel.json` at the repository root holds the settings (repository root as Root Directory, framework *Other*, `npm ci`, `npm run build:web`, output `apps/web/dist`).
+### Deploy (Vercel)
+
+`vercel.json` holds the settings: Root Directory = repository root, Framework = *Other*, `npm ci`, **`npm run build:deploy`**, output `apps/web/dist`, Node 22.x.
+
+`build:deploy` ([scripts/build-release.mjs](scripts/build-release.mjs)) builds the website, builds the Chrome extension pointed at the deployed address (Vercel's `VERCEL_PROJECT_PRODUCTION_URL`, or `CUSTODI_WEB_URL` to override), adds that origin to the extension's `externally_connectable`, and publishes **`/downloads/custodi-extension.zip`** (plus version, size and SHA-256 in `custodi-extension.json`) for the website's download page at `/extension`.
 
 ## Chrome extension
 
@@ -152,7 +156,7 @@ npm run build:extension
 
 The popup opens on **Home**: *Open CUSTODI Website*, *Scan this page*, quick routes to **Message**, **Website** and **Live Observe**, your latest result, and what the extension can and can't see.
 
-**Point the website link at your deployment.** Set `PRODUCTION_WEB_URL` in [`apps/extension/src/config.ts`](apps/extension/src/config.ts) to the site's `https://` address — or build with `VITE_CUSTODI_WEB_URL=https://… npm run build:extension` — then reload the extension. Until then it opens the local dev site and says so.
+**Website link.** The extension opens and talks to `https://custodi-phi.vercel.app`. That address is set once in `DEFAULT_PRODUCTION_URL` in [`apps/extension/vite.config.ts`](apps/extension/vite.config.ts); a build can override it with `VITE_CUSTODI_WEB_URL=https://…`. Localhost is still accepted for development.
 
 | Permission | When | Why |
 |---|---|---|

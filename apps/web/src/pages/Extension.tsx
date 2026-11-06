@@ -1,10 +1,10 @@
-import { CheckCircle2, ChevronDown, Copy } from "lucide-react";
-import { useEffect } from "react";
+import { ArrowRight, CheckCircle2, ChevronDown, Copy, Download, Globe, ScanLine } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { copyText } from "../lib/download";
 import { EXTENSION_FOLDER, useExtension } from "../lib/extension";
 import { setFlag } from "../lib/store";
-import { Button, ButtonLink } from "../ui/Button";
+import { Button, ButtonLink, buttonClass } from "../ui/Button";
 import { Notice, useToast } from "../ui/Feedback";
 import { Container, PageHeader } from "../ui/Layout";
 
@@ -45,8 +45,8 @@ const FAQ: [string, React.ReactNode][] = [
   [
     "Chrome says “Manifest file is missing or unreadable”",
     <>
-      You picked the wrong folder. Choose <code className="font-mono">{EXTENSION_FOLDER}</code> (the one that contains <code className="font-mono">manifest.json</code>). If the folder doesn't
-      exist, run the build command first.
+      You picked the wrong folder. Unzip the download first, then choose the <code className="font-mono">custodi-extension</code> folder — the one that directly contains{" "}
+      <code className="font-mono">manifest.json</code>. Chrome can't load the ZIP file itself. (Building from source? Choose <code className="font-mono">{EXTENSION_FOLDER}</code>.)
     </>,
   ],
   ["“This page can't be scanned”", "Chrome blocks every extension from reading its own pages (chrome://…, the new-tab page, the Chrome Web Store). Open a normal website."],
@@ -56,11 +56,80 @@ const FAQ: [string, React.ReactNode][] = [
   ],
   [
     "The Live Observe page says “Extension not detected”",
-    "The extension only accepts messages from CUSTODI running on your computer (http://localhost). Open the website at localhost, make sure the extension is enabled, then reload the page.",
+    "The extension only talks to this website's own address (and to localhost, for developers). Make sure you installed the version downloaded from this page, that it's switched on in chrome://extensions, then reload this page.",
+  ],
+  [
+    "Chrome shows a notice about developer-mode extensions",
+    "That's expected for extensions loaded with “Load unpacked” — CUSTODI isn't on the Chrome Web Store yet. You can dismiss it; the extension keeps working.",
   ],
   ["I denied the permission by mistake", "Just press Start again — Chrome will ask again. Nothing starts without it."],
   ["Does it work on my phone?", "No. Mobile Chrome doesn't support extensions. Use the CUSTODI web app on your phone (it can be installed to your home screen)."],
 ];
+
+interface ReleaseMeta {
+  version: string;
+  bytes: number;
+  sha256: string;
+  files: number;
+  websiteUrl: string | null;
+}
+const ZIP_URL = "/downloads/custodi-extension.zip";
+
+/** Reads the details the production build publishes next to the ZIP (scripts/build-release.mjs). */
+function useRelease() {
+  const [meta, setMeta] = useState<ReleaseMeta | null | "missing">(null);
+  useEffect(() => {
+    let alive = true;
+    fetch("/downloads/custodi-extension.json", { cache: "no-store" })
+      .then((r) => (r.ok && r.headers.get("content-type")?.includes("json") ? r.json() : Promise.reject()))
+      .then((m: ReleaseMeta) => alive && setMeta(m))
+      .catch(() => alive && setMeta("missing"));
+    return () => {
+      alive = false;
+    };
+  }, []);
+  return meta;
+}
+
+function DownloadPanel() {
+  const meta = useRelease();
+  const ready = meta && meta !== "missing";
+  return (
+    <div className="panel p-6 sm:p-8">
+      <p className="t-eyebrow text-accent">Chrome extension · Manifest V3</p>
+      <h2 className="t-h2 mt-3">Download CUSTODI for Chrome</h2>
+      <p className="mt-3 max-w-xl text-ink-2">A ZIP of the ready-built extension. Unzip it, then load the folder in Chrome — four steps below.</p>
+      {meta === "missing" ? (
+        <Notice tone="warning" title="The download isn't built on this copy of the site">
+          The ZIP is created by the production build (<code className="font-mono">npm run build:deploy</code>). Developers can build the extension instead — see the last
+          step below.
+        </Notice>
+      ) : (
+        <div className="mt-6 flex flex-wrap items-center gap-4">
+          <a href={ZIP_URL} download="custodi-extension.zip" className={buttonClass("primary", "lg")} aria-disabled={!ready}>
+            <Download className="h-5 w-5" /> Download extension (.zip)
+          </a>
+          {ready && (
+            <dl className="grid grid-cols-3 gap-x-6 gap-y-1 font-mono text-xs text-muted">
+              <dt>Version</dt>
+              <dt>Size</dt>
+              <dt>Files</dt>
+              <dd className="text-ink">{meta.version}</dd>
+              <dd className="text-ink">{Math.round(meta.bytes / 1024)} KB</dd>
+              <dd className="text-ink">{meta.files}</dd>
+            </dl>
+          )}
+        </div>
+      )}
+      {ready && (
+        <p className="mt-4 font-mono text-[11px] break-all text-muted">
+          SHA-256 {meta.sha256}
+          {meta.websiteUrl ? ` · opens ${new URL(meta.websiteUrl).host}` : ""}
+        </p>
+      )}
+    </div>
+  );
+}
 
 export default function Extension() {
   const { state } = useExtension();
@@ -69,11 +138,44 @@ export default function Extension() {
   return (
     <Container className="pt-10 md:pt-14">
       <PageHeader
-        eyebrow="Chrome extension"
-        title="CUSTODI in your browser toolbar"
-        description="Scan the page you're on with one click, check messages without leaving Chrome, and run Live Observe sessions you control."
-        actions={<ButtonLink to="#install">Install it — 2 minutes</ButtonLink>}
+        eyebrow="Get CUSTODI"
+        title="Use it here. Add it to Chrome."
+        description="Everything works in this website — nothing to install. Add the Chrome extension to check the page you're on with one click."
+        actions={
+          <a href="#download" className={buttonClass("primary", "md")}>
+            <Download className="h-4 w-4" /> Download the extension
+          </a>
+        }
       />
+
+      <nav aria-label="Start here" className="mt-8 grid grid-cols-1 border-y border-line sm:grid-cols-3 sm:divide-x sm:divide-line">
+        {[
+          { to: "/scan", icon: ScanLine, t: "Scan a message", d: "Paste an email, SMS or WhatsApp text" },
+          { to: "/website", icon: Globe, t: "Check a website", d: "Read an address without opening it" },
+          { to: "#download", icon: Download, t: "Get the Chrome extension", d: "Download, unzip, load — 2 minutes" },
+        ].map(({ to, icon: I, t, d }) => {
+          const inner = (
+            <>
+              <I className="h-5 w-5 flex-none text-accent" aria-hidden />
+              <span className="flex-1">
+                <span className="block font-medium text-ink">{t}</span>
+                <span className="block text-sm text-muted">{d}</span>
+              </span>
+              <ArrowRight className="h-4 w-4 text-muted transition-transform group-hover:translate-x-0.5" aria-hidden />
+            </>
+          );
+          const cls = "group flex items-center gap-4 border-b border-line px-1 py-5 last:border-b-0 hover:text-accent sm:border-b-0 sm:px-5";
+          return to.startsWith("#") ? (
+            <a key={t} href={to} className={cls}>
+              {inner}
+            </a>
+          ) : (
+            <Link key={t} to={to} className={cls}>
+              {inner}
+            </Link>
+          );
+        })}
+      </nav>
 
       <div className="mt-6">
         {state.kind === "connected" ? (
@@ -109,18 +211,24 @@ export default function Extension() {
         </ul>
       </section>
 
-      <section id="install" className="mt-16 scroll-mt-24">
-        <h2 className="t-h2">Install it</h2>
-        <Notice tone="info">
-          CUSTODI isn't on the Chrome Web Store yet, so a website button can't install it for you. You'll load it from this project folder — Chrome calls this
-          “unpacked”. It's safe and you can remove it any time.
-        </Notice>
+      <section id="download" className="mt-12 scroll-mt-24">
+        <DownloadPanel />
+      </section>
+
+      <section id="install" className="mt-14 scroll-mt-24">
+        <h2 className="t-h2">Install it in Chrome</h2>
+        <div className="mt-4">
+          <Notice tone="info">
+            CUSTODI isn't on the Chrome Web Store yet, so you add it with Chrome's <b>Load unpacked</b> option. It's safe, needs no account, and you can remove it any
+            time from chrome://extensions. Works in desktop Chrome, Edge and Brave — not on phones.
+          </Notice>
+        </div>
         <ol className="mt-4">
-          <Step n={1} title="Build the extension">
-            <p>Open Terminal in the project folder and run:</p>
-            <Cmd>npm run build:extension</Cmd>
-            <p className="text-sm text-muted">
-              This creates the folder <code className="font-mono text-ink">{EXTENSION_FOLDER}</code>.
+          <Step n={1} title="Download and unzip">
+            <p>
+              Download <code className="font-mono text-ink">custodi-extension.zip</code> above and unzip it — on a Mac, double-click it; on Windows, right-click →{" "}
+              <b>Extract All</b>. You get a folder called <code className="font-mono text-ink">custodi-extension</code> with <code className="font-mono text-ink">manifest.json</code>{" "}
+              inside. Keep that folder; Chrome loads the extension from it.
             </p>
           </Step>
           <Step n={2} title="Open Chrome's extension page">
@@ -131,18 +239,30 @@ export default function Extension() {
           </Step>
           <Step n={3} title="Load CUSTODI">
             <p>
-              Click <b>Load unpacked</b> and choose the folder:
+              Click <b>Load unpacked</b> and choose the unzipped <code className="font-mono text-ink">custodi-extension</code> folder (not the ZIP).
             </p>
-            <Cmd>{`TrustLayer-AI/${EXTENSION_FOLDER}`}</Cmd>
             <p className="text-sm text-muted">A CUSTODI card appears. Its ID should be hbhalijjblgneikgjipkleckcpemmlkj.</p>
           </Step>
           <Step n={4} title="Pin it to the toolbar" id="pin">
             <p>
               Click the puzzle-piece icon to the right of the address bar, find <b>CUSTODI</b> and click the pin. The CUSTODI icon now sits in your toolbar, where
-              you'll see its <b>ON</b> and risk badges.
+              you'll see its <b>ON</b> and risk badges. Open it and choose <b>Open CUSTODI Website</b> to come back here any time.
             </p>
           </Step>
         </ol>
+        <details className="group mt-2 border-t border-line pt-4">
+          <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-medium text-ink-2 [&::-webkit-details-marker]:hidden">
+            <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" /> Developers: build it from the source instead
+          </summary>
+          <div className="mt-3 text-sm text-ink-2">
+            <p>In the project folder run:</p>
+            <Cmd>npm run build:extension</Cmd>
+            <p className="mt-2">
+              then load <code className="font-mono text-ink">{EXTENSION_FOLDER}</code>. The website address it opens is set in{" "}
+              <code className="font-mono">apps/extension/vite.config.ts</code> (or override it with <code className="font-mono">VITE_CUSTODI_WEB_URL</code>).
+            </p>
+          </div>
+        </details>
       </section>
 
       <section className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-2">
@@ -195,6 +315,24 @@ export default function Extension() {
         </div>
         <p className="mt-3 flex items-center gap-2 text-sm text-muted">
           <CheckCircle2 className="h-4 w-4 text-low" /> No account, no server, no tracking. The extension never sends page content anywhere.
+        </p>
+        <h3 className="t-h3 mt-10" id="limits">
+          What it can't do
+        </h3>
+        <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm text-ink-2">
+          <li>Read WhatsApp, SMS or email inboxes, or anything you type.</li>
+          <li>Run in the background — it scans only when you click, or during a Live Observe session you start.</li>
+          <li>Look up blocklists, domain age or sender authentication — those checks say “unavailable”.</li>
+          <li>Guarantee a page is safe. A low result means no obvious warning signs, nothing more.</li>
+        </ul>
+        <p className="mt-3 text-sm">
+          <Link to="/help#limits" className="text-accent underline underline-offset-4">
+            Full limitations
+          </Link>{" "}
+          ·{" "}
+          <Link to="/help#privacy" className="text-accent underline underline-offset-4">
+            Privacy
+          </Link>
         </p>
       </section>
 

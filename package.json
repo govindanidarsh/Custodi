@@ -1,7 +1,7 @@
 {
   "name": "custodi",
   "private": true,
-  "description": "CUSTODI \u2014 Your Personal Digital Bodyguard. Monorepo: shared analyzer, web app/PWA and Chrome extension.",
+  "description": "CUSTODI — Your Personal Digital Bodyguard. Monorepo: shared analyzer, web app/PWA and Chrome extension.",
   "workspaces": [
     "packages/*",
     "apps/*"
@@ -15,7 +15,8 @@
     "build:extension": "npm run build -w @custodi/extension",
     "preview": "npm run preview -w @custodi/web",
     "icons": "node scripts/build-logo-assets.mjs",
-    "check": "npm run typecheck && npm test && npm run build"
+    "check": "npm run typecheck && npm test && npm run build",
+    "build:deploy": "node scripts/build-release.mjs"
   },
   "engines": {
     "node": ">=20"
