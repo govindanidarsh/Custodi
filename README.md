@@ -2,6 +2,8 @@
 
 **Think before you trust. Verify before you act.**
 
+CUSTODI is a privacy-first cybersecurity platform that detects suspicious HR emails, fake job offers, phishing messages, and unsafe websites through transparent risk analysis, website checks, and a Chrome extension. Think before you trust. Verify before you act.
+
 CUSTODI helps students check suspicious placement, internship and recruiter messages — and the links in them —
 before they act. Paste an email, SMS or WhatsApp message (or check a web address, or the page you're on in Chrome)
 and get a risk level, the exact words that raised concern, a transparent score breakdown and a safe next step.
